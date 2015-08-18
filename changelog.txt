@@ -1,0 +1,17 @@
+RatSLAM Changelog
+
+v1.00
+* Initial release to public
+
+v1.01
+* Fixed experience map bug
+
+v1.02
+* Added support for reading odo from file
+* Added experience map playback
+* Added a readme.txt file
+* Added more comments in the code
+
+v1.03
+* Added rs_main.m for handling core RatSLAM process
+
