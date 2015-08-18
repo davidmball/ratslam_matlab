@@ -1,7 +1,7 @@
 RatSLAM Code Release (Matlab Version)
 
-Copyright (C) 2008 David Ball (d.ball@uq.edu.au) (MATLAB version)
-Michael Milford (m.milford1@uq.edu.au) & Gordon Wyeth (g.wyeth@uq.edu.au)
+Copyright (C) 2008 David Ball (davidmichaelball@gmail.com) (MATLAB version)
+Algorithm - Michael Milford & Gordon Wyeth
  
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ** Introduction **
 
-The RatSLAM system performs vision based SLAM using a computational model of the rodent hippocampus. RatSLAM is capable of performing real-time on-line SLAM in indoor and outdoor environments.
+The RatSLAM system performs vision based SLAM using a computational model of the rodent hippocampus. RatSLAM is capable of performing real-time on-line SLAM in indoor and outdoor environments. The MATLAB implementation is intended to demonstrate how RatSLAM works and allow you to test your own datasets. Unlike our C version, the code is unoptimised and will slow down linerly as more visual templates and expereiences are learnt.
 
 We are very interested in hearing about your experiences using the RatSLAM system.
 
@@ -29,23 +29,26 @@ The core of the RatSLAM system is:
 3. Pose cell attractor network - The odometric infomration shifts the activity packet(s) and view templates inject energy into the pose cells.
 4. Experience Map - Topological map of expereiences with odometric links
 
+If you use this code please reference the following paper:
+David Ball, Scott Heath, Michael Milford, Gordon Wyeth, Janet Wiles (2010) A navigating rat animat, Proceedings of the 12th International Conference on the Synthesis and Simulation of Living Systems, 804-811, MIT Press
+
 For further reading:
+http://www.davidmichaelball.com/portfolio-items/openratslam/
+
 M. J. Milford, G. Wyeth, "Mapping a Suburb with a Single Camera using a Biologically Inspired SLAM System", accepted to IEEE Transactions on Robotics Special Issue on Visual SLAM. Scheduled for publication October 2008. 
 
 M. J. Milford, "Robot Navigation from Nature", Springer-Verlag, March 2008.
 
 M. J. Milford, G. Wyeth, D. Prasser, "RatSLAM on the Edge: Revealing a Coherent Representation from an Overloaded Rat Brain", International Conference on Intelligent Robots and Systems, Beijing, China, 2006.
 
-The MATLAB implementation is intended to demonstrate how RatSLAM works and allow you to test your own datasets. Unlike our C version, the code is unoptimised and will slow down linerly as more visual templates and expereiences are learnt.
-
-Contact dball at itee.uq.edu.au regarding the MATLAB code.
+Contact davidmichaelball@gmail.com regarding the MATLAB code.
 
 
 ** Installation and Setup **
 
 Either change the MATLAB path to the code directory or add it to MATLAB's path list.
 
-Download the desired dataset(s) from http://ratslam.itee.uq.edu.au/code.html. For the xvid compressed video you may need a codec. For Windows K-Lite Codec (http://www.free-codecs.com/download/K_lite_codec_pack.htm) is good, otherwise try the ffdshow (http://sourceforge.net/projects/ffdshow-tryout/) from sourceforge.
+Download the desired dataset(s) from https://wiki.qut.edu.au/display/cyphy/RatSLAM+MATLAB. For the xvid compressed video you may need a codec. For Windows K-Lite Codec (http://www.free-codecs.com/download/K_lite_codec_pack.htm) is good, otherwise try the ffdshow (http://sourceforge.net/projects/ffdshow-tryout/) from sourceforge.
 
 Open the st_lucia.m or axon5.m script file and set the MOV_NAME with the full path to where you put the dataset. Run the script file.
 
@@ -69,7 +72,7 @@ Playing back the Experience Map, active view templates and experience templates.
 The rs_exp_playback.m file allows you to playback experiences if you logged them. They will be logged at the BLOCK_READ rate in rs_main.m
 
 Example usage is:
-rs_exp_playback('st_lucia1_log', 1000:100:5000)
+rs_exp_playback('st_lucia1_log', 1000 : 100 : 5000)
 which will read the log files that start with st_lucia1_log starting at frame 1000 and ending at frame 5000 in increments of 100 frames. The smallest increament you can have is in BLOCK_READ's which defaults to 100.
 
 
