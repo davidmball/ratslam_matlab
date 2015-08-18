@@ -1,6 +1,7 @@
-RatSLAM Code Release (Matlab Version)
+RatSLAM Code Release (MATLAB Version)
 
 Copyright (C) 2008 David Ball (davidmichaelball@gmail.com) (MATLAB version)
+
 Algorithm - Michael Milford & Gordon Wyeth
  
 This program is free software: you can redistribute it and/or modify
