@@ -98,9 +98,9 @@ max_act_xyth_path = [x_pc y_pc th_pc];
 odo = [0 0 pi / 2];
 
 % specify the movie and the frames to read
-movinfo = aviinfo(MOV_FILE);
+movinfo = VideoReader(MOV_FILE);
 START_FRAME = 1;
-END_FRAME = movinfo.NumFrames;
+END_FRAME = movinfo.NumberOfFrames;
 
 % these are the raw image dimensions
 % the offset is the number of pixels from the centre of the image to the
@@ -231,23 +231,35 @@ prev_vrot_image_x_sums = zeros(1, size(IMAGE_ODO_X_RANGE, 2));
 prev_vtrans_image_x_sums = zeros(1, size(IMAGE_ODO_X_RANGE, 2));
 
 % grab the video info and first block ... send to the vision module
-mov = aviread(MOV_FILE, START_FRAME:(BLOCK_READ+START_FRAME));
+mov = VideoReader(MOV_FILE); % SA replacement for aviread 234->243
+vidWidth = mov.Width;
+vidHeight = mov.Height;
+s = struct('cdata',zeros(vidHeight,vidWidth,3,'uint8'),...
+    'colormap',[]);
+k = START_FRAME;
+while  k<=(START_FRAME + (BLOCK_READ-1))
+    s(k).cdata = readFrame(mov);
+    k = k+1;
+end
 
 if ODO_FILE ~= 0
-    ododata = csvread(ODO_FILE, START_FRAME, 0, [START_FRAME 0 min([(BLOCK_READ - 1)+START_FRAME, movinfo.NumFrames]) 1]);
+    ododata = csvread(ODO_FILE, START_FRAME, 0, [START_FRAME 0 min([(BLOCK_READ - 1)+START_FRAME, movinfo.NumberOfFrames]) 1]);
 end
 
 time_delta_s = [];
 tic
 
-for frame=2:min([END_FRAME, movinfo.NumFrames])
+for frame=2:min([END_FRAME, movinfo.NumberOfFrames])
 
     % save the experience map information to the disk for later playback
     % read the avi file in blocks and record the delta time
     if (mod(frame, BLOCK_READ) == 0)
         save(strcat(LOG_FILE, num2str(frame)), 'frame', 'exps', 'exp_history', 'vt_history');
         time_delta_s = [time_delta_s; toc]; %#ok<AGROW>
-        mov = aviread(MOV_FILE, (frame+START_FRAME):min([(frame+BLOCK_READ - 1)+START_FRAME, movinfo.NumFrames]));
+        while  k<= min([(frame+BLOCK_READ - 1)+START_FRAME, movinfo.NumberOfFrames]);
+         s(k).cdata = readFrame(mov);
+         k = k+1;
+         end
         if ODO_FILE ~= 0
             ododata = csvread(ODO_FILE, frame+START_FRAME, 0, [frame+START_FRAME 0 min([(frame+BLOCK_READ - 1)+START_FRAME, movinfo.NumFrames]) 1]);
         end
@@ -255,7 +267,7 @@ for frame=2:min([END_FRAME, movinfo.NumFrames])
     end
 
     % visual templates and visual odo uses intensity so convert to grayscale
-    im = rgb2gray(mov(mod(frame, BLOCK_READ) + 1).cdata);
+    im = rgb2gray(s(mod(frame, BLOCK_READ) + 1).cdata);
 
     % get the most active view template
     [vt_id] = rs_visual_template(im, x_pc, y_pc, th_pc);
@@ -286,7 +298,7 @@ for frame=2:min([END_FRAME, movinfo.NumFrames])
         
         % render the raw image
         subplot(3, 3, 1, 'replace');
-        image(mov(mod(frame, BLOCK_READ) + 1).cdata);
+        image(s(mod(frame, BLOCK_READ) + 1).cdata);
         title('Raw Image');
         
         % render the history of visual templates
