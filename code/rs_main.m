@@ -237,7 +237,7 @@ vidHeight = mov.Height;
 s = struct('cdata',zeros(vidHeight,vidWidth,3,'uint8'),...
     'colormap',[]);
 k = START_FRAME;
-while  k<=(START_FRAME + (BLOCK_READ-1))
+while  k<=END_FRAME
     s(k).cdata = readFrame(mov);
     k = k+1;
 end
@@ -249,25 +249,25 @@ end
 time_delta_s = [];
 tic
 
-for frame=2:min([END_FRAME, movinfo.NumberOfFrames])
+for frame=2:END_FRAME
 
     % save the experience map information to the disk for later playback
     % read the avi file in blocks and record the delta time
     if (mod(frame, BLOCK_READ) == 0)
         save(strcat(LOG_FILE, num2str(frame)), 'frame', 'exps', 'exp_history', 'vt_history');
         time_delta_s = [time_delta_s; toc]; %#ok<AGROW>
-        while  k<= min([(frame+BLOCK_READ - 1)+START_FRAME, movinfo.NumberOfFrames]);
+        while  k<= END_FRAME
          s(k).cdata = readFrame(mov);
          k = k+1;
          end
         if ODO_FILE ~= 0
-            ododata = csvread(ODO_FILE, frame+START_FRAME, 0, [frame+START_FRAME 0 min([(frame+BLOCK_READ - 1)+START_FRAME, movinfo.NumFrames]) 1]);
+            ododata = csvread(ODO_FILE, frame+START_FRAME, 0, [frame+START_FRAME 0 END_FRAME 1]);
         end
         tic
     end
 
     % visual templates and visual odo uses intensity so convert to grayscale
-    im = rgb2gray(s(mod(frame, BLOCK_READ) + 1).cdata);
+    im = rgb2gray(s(mod(frame, END_FRAME) + 1).cdata);
 
     % get the most active view template
     [vt_id] = rs_visual_template(im, x_pc, y_pc, th_pc);
@@ -276,8 +276,8 @@ for frame=2:min([END_FRAME, movinfo.NumberOfFrames])
     if ODO_FILE == 0
         [vtrans, vrot] = rs_visual_odometry(im);
     else
-        vtrans = ododata(mod(frame, BLOCK_READ) + 1, 1);
-        vrot = ododata(mod(frame, BLOCK_READ) + 1, 2)*ODO_ROT_SCALING;
+        vtrans = ododata(mod(frame, END_FRAME) + 1, 1);
+        vrot = ododata(mod(frame, END_FRAME) + 1, 2)*ODO_ROT_SCALING;
     end
     % track the motion based on raw odometry only (for comparison)
     odo(frame, 1) = odo(frame - 1, 1) + vtrans * cos(odo(frame - 1, 3) + vrot);
@@ -298,7 +298,7 @@ for frame=2:min([END_FRAME, movinfo.NumberOfFrames])
         
         % render the raw image
         subplot(3, 3, 1, 'replace');
-        image(s(mod(frame, BLOCK_READ) + 1).cdata);
+        image(s(mod(frame, END_FRAME) + 1).cdata);
         title('Raw Image');
         
         % render the history of visual templates
